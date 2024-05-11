@@ -9,13 +9,19 @@ env.hosts = ["54.157.191.51", "52.91.116.19"]
 
 
 def do_pack():
-    """Generates a.tgz archive"""
+    """Generates a.tgz archive, including my_index.html if it exists"""
     local("mkdir -p versions")
     file_name = "versions/web_static_{}.tgz".format(
         datetime.now().strftime("%Y%m%d%H%M%S")
     )
-    result = local("tar -cvzf {} web_static".format(file_name))
-    if result.failed:
+    # Check if my_index.html exists in the web_static directory
+    if os.path.isfile("web_static/my_index.html"):
+        # Include my_index.html in the archive
+        local("tar -cvzf {} web_static my_index.html".format(file_name))
+    else:
+        # If my_index.html doesn't exist, archive only the web_static directory
+        local("tar -cvzf {} web_static".format(file_name))
+    if local("tar -cvzf {} web_static".format(file_name)).failed:
         return None
     return file_name
 
