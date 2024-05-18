@@ -123,40 +123,40 @@ class HBNBCommand(cmd.Cmd):
         """Overrides the emptyline method of CMD"""
         pass
 
+    def do_create(self, args):
+        """Create an object of any class with given parameters."""
+        if not args:
+            print("** class name missing **")
+            return
+        elif args not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+            return
 
-def do_create(self, args):
-    """Create an object of any class with given parameters."""
-    if not args:
-        print("** class name missing **")
-        return
-    elif args not in HBNBCommand.classes:
-        print("** class doesn't exist **")
-        return
+        # Parse the parameters
+        params = args.split()
+        class_name = params[0]
+        params = params[1:]  # Remove the class name from the list
 
-    # Parse the parameters
-    params = args.split()
-    class_name = params[0]
-    params = params[1:]  # Remove the class name from the list
+        # Initialize the new instance
+        new_instance = HBNBCommand.classes[class_name]()
 
-    # Initialize the new instance
-    new_instance = HBNBCommand.classes[class_name]()
+        # Process each parameter
+        for param in params:
+            key, value = param.split("=")
+            # Unescape double quotes
+            value = value.strip('"').replace('\\"', '"')
+            if value.isdigit():  # Check if integer
+                value = int(value)
+            elif "." in value:  # Check if float
+                value = float(value)
 
-    # Process each parameter
-    for param in params:
-        key, value = param.split("=")
-        value = value.strip('"').replace('\\"', '"')  # Unescape double quotes
-        if value.isdigit():  # Check if integer
-            value = int(value)
-        elif "." in value:  # Check if float
-            value = float(value)
+            setattr(new_instance, key, value)
 
-        setattr(new_instance, key, value)
+        # Save the new instance to storage
+        storage.new(new_instance)
+        storage.save()
 
-    # Save the new instance to storage
-    storage.new(new_instance)
-    storage.save()
-
-    print(new_instance.id)
+        print(new_instance.id)
 
     def help_create(self):
         """Help information for the create method"""
